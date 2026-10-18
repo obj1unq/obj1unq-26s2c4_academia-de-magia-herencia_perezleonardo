@@ -1,43 +1,51 @@
+
 class Cosa{
 	//algo a guardar
 	const property marca
 	const property volumen
-	const property magico
+	const property magica
 	const property reliquia   
 }
 
 class Mueble{
-	//guarda cosas, es el TIPO, ergo, clase abstracta
+	//guarda objetos del tipo Cosa
 	const property cosas = []
-	method puedeGuardar(cosa)
-	method validarGuardar(cosa){
-		//Si no puede guardar, tira error
-		if (! self.puedeGuardar(cosa)) {(self.error("No se puede guardar"))}
+
+	method estaGuardada(cosa){
+		return cosas.contains(cosa) //este metodo puede ser redundante, pero con los test se reutiliza
 	}
-	method validarExiste(cosa){
-		if (cosas.contains(cosa)) {(self.error("No se puede guardar porque ya está guardado"))}
+	method admite(cosa)
+	method validarAdmitir(cosa){
+		//Si no puede guardar, tira error
+		if (! self.admite(cosa)) {(self.error("No se admite este objeto"))}
+	}
+	method validarNoGuardada(cosa){
+		//Si ya está guardada, tira error 
+		if (self.estaGuardada(cosa)) {(self.error("No se puede guardar porque ya está guardado"))}
+	}
+	method validarGuardar(cosa){
+		self.validarNoGuardada(cosa)
+		self.validarAdmitir(cosa)
 	}
 	method guardar(cosa){
-		self.validarExiste(cosa)
 		self.validarGuardar(cosa)
 		cosas.add(cosa)
-
 	}
 }
 
 class ArmarioConvencional inherits Mueble{
-	const property cantidadMax 
+	var property cantidadMax 
 
-	override method puedeGuardar(cosa){
+	override method admite(cosa){
 		//retorna si puede o no guardar cosa
 		return (cosas.size() + 1) <= cantidadMax 
 	}
 }
 class GabineteMagico inherits Mueble{
 
-	override method puedeGuardar(cosa){
+	override method admite(cosa){
 		//retorna si puede o no guardar cosa
-		return cosa.magico()
+		return cosa.magica()
 	}
 }
 class Baul inherits Mueble{
@@ -47,7 +55,7 @@ class Baul inherits Mueble{
 		return cosas.sum({ cosa => cosa.volumen()})
 	}
 
-	override method puedeGuardar(cosa){
+	override method admite(cosa){
 		//retorna si puede o no guardar cosa
 		return (cosa.volumen()+ self.volumenUsado()) <= capacidadMax
 	}
@@ -56,4 +64,30 @@ class Baul inherits Mueble{
 }
 
 
-object academiaDeMagia {}
+class Academia{
+	const property muebles = []
+
+	method estaGuardada(cosa){
+		return muebles.any({ mueble => mueble.estaGuardada(cosa) })
+	}
+	method buscar(cosa){
+		return muebles.find({mueble => mueble.estaGuardada(cosa)})
+	}
+
+	method algunMuebleAdmite(cosa){
+		return ! self.mueblesQueAdmiten(cosa).isEmpty()
+	}
+	method sePuedeGuardar(cosa) {
+    	return (!self.estaGuardada(cosa)) &&  self.algunMuebleAdmite(cosa)
+		}
+	method mueblesQueAdmiten(cosa){
+		return muebles.filter({mueble => mueble.admite(cosa)})
+	}
+	method validarSePuedeGuardar(cosa){
+		if(!self.sePuedeGuardar(cosa)){self.error("No se puede guardar")}
+	}
+	method guardar(cosa) {
+    self.validarSePuedeGuardar(cosa)
+    self.mueblesQueAdmiten(cosa).first().guardar(cosa)
+}
+}
