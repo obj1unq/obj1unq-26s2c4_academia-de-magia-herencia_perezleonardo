@@ -102,7 +102,7 @@ otro baúl más de otra capacidad, más gabinetes, etc.*
 ## Parte 2:  Utilidad y precio
 
 La **utilidad de un mueble** es un número que sirve como indicador para saber si un mueble está siendo 
-bien usando o no. Se calcula como la división entre la sumatoria de la utilidad de las cosas que 
+bien usado o no. Se calcula como la división entre la sumatoria de la utilidad de las cosas que 
 se guardan en ese mueble, sobre el precio del mueble. 
 
 ```
